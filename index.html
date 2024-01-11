@@ -125,15 +125,7 @@
 
     function appGetAds() {
         const bridge = vkBridge.default;
-        bridge.send("VKWebAppGetAds", {})
-        .then(data => {
-          console.log(data);
-          if (data.type == "VKWebAppCheckNativeAds")
-          {
-            myGameInstance.SendMessage('VkBridge', 'AdvertisementPreloadedResult', JSON.stringify(data));
-          }
-        })  
-        .catch(error => console.log(error));          
+        bridge.send('VKWebAppCheckNativeAds', { ad_format: 'interstitial'});
     }
     
     function getLaunchParams() {
