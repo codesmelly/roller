@@ -62,17 +62,19 @@
         return false;
     }());
 
-    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        container.className = "unity-mobile";
-        //config.devicePixelRatio = 1;
-    }
-    loadingCover.style.display = "";
-
     let player;
     let leaderboard;
     let myGameInstance = null;
     let payments = null;
     let promptCanShow = false;
+    let mobile = false;    
+
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        container.className = "unity-mobile";
+        mobile = true;
+        //config.devicePixelRatio = 1;
+    }
+    loadingCover.style.display = "";
 
     const script = document.createElement("script");
     script.src = loaderUrl;
@@ -95,16 +97,20 @@
     
     document.body.appendChild(script);
 
+    const bridge = vkBridge.default;
+    bridge.send("VKWebAppInit", {})
+        .then(data => {
+            console.log(data);
+        })
+        .catch(error => console.log(error)); 
+
     function initBridge() {
         const bridge = vkBridge.default;
         
         bridge.subscribe(eventHandler); 
 
-        bridge.send("VKWebAppInit", {})
-        .then(data => {
-          myGameInstance.SendMessage('VkBridge', 'Initialized', JSON.stringify(data));  
-        })  
-        .catch(error => console.log(error));          
+        myGameInstance.SendMessage('VkBridge', 'Initialized', 'true'); 
+         
     }
     
     function eventHandler(e) {
@@ -317,8 +323,16 @@
         .catch(error => {
             myGameInstance.SendMessage('VkBridge', 'SendResult', JSON.stringify(error));
         });;
-      }  
+    }
 
+    function CheckMobile() {
+        if (mobile) {
+            myGameInstance.SendMessage('VkBridge', 'CheckMobileResult', 'true');
+        }
+        else {
+            myGameInstance.SendMessage('VkBridge', 'CheckMobileResult', 'false');
+        }
+    }
     
 </script>
 </body>
